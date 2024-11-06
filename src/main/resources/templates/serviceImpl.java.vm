@@ -11,6 +11,7 @@ import ${package.Mapper}.${table.mapperName};
 import ${package.Service}.${table.serviceName};
 #end
 import ${superServiceImplClassPackage};
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,13 +24,16 @@ import org.springframework.stereotype.Service;
  */
 @Service
 #if(${kotlin})
-open class ${table.serviceImplName} : ${superServiceImplClass}<${table.mapperName}, ${entity}>()#if(${generateService}), ${table.serviceName}#end {
+open class ${table.serviceImplName} : ${superServiceImplClass}()#if(${generateService}), ${table.serviceName}#end {
 #else
-public class ${table.serviceImplName} extends ${superServiceImplClass}<${table.mapperName}, ${entity}DO>#if(${generateService}) implements ${table.serviceName}#end {
+public class ${table.serviceImplName} extends ${superServiceImplClass}#if(${generateService}) implements ${table.serviceName}#end {
 #end
 
+    @Autowired
+    protected ${table.mapperName} baseMapper;
+
     @Override
-    public PageDTO<${entity}VO> page(${className}PageVO vo) {
+    public PageDTO<${entity}VO> page(${entity}PageVO vo) {
         PageDTO<${entity}DO> page = baseMapper.page(vo);
         return ${entity}Convertor.INSTANCE.convert(page);
     }
