@@ -1,17 +1,14 @@
-package ${cfg.convert};
+package ${package.Parent}.${convert};
 
-#foreach($pkg in ${table.importPackages})
-import ${pkg};
-#end
-#if(${springdoc})
-import io.swagger.v3.oas.annotations.media.Schema;
-#elseif(${swagger})
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-#end
+import ${package.Entity}.${entity};
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.layban.common.core.model.dto.PageDTO;
+import ${package.Controller}.vo.${entity}VO;
+import ${package.Controller}.vo.add.${entity}AddVO;
+import ${package.Controller}.vo.update.${entity}UpdateVO;
+import ${package.Controller}.vo.qry.${entity}PageVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-import cn.wnhyang.generator.pojo.PageResult;
 
 /**
  * $!{table.comment}
@@ -19,25 +16,20 @@ import cn.wnhyang.generator.pojo.PageResult;
  * @author ${author}
  * @since ${date}
  */
-#if(${springdoc})
-@Schema(name = "${entity}", description = "$!{table.comment}")
-#elseif(${swagger})
-@ApiModel(value = "${entity}对象", description = "$!{table.comment}")
-#end
 @Mapper
 public interface ${entity}Convert {
 
     ${entity}Convert INSTANCE = Mappers.getMapper(${entity}Convert.class);
 
-    PageResult<${entity}VO> convert(PageResult<${entity}> pageResult);
+    PageDTO<${entity}VO> convert(IPage<${entity}DO> page);
 
-    List<${entity}VO> convert(List<${entity}> list);
+    List<${entity}VO> convert(List<${entity}DO> list);
 
     ${entity} convert(${entity}AddVO createVO);
 
     ${entity} convert(${entity}UpdateVO updateVO);
 
-    ${entity}VO convert(${entity} po);
+    ${entity}VO convert(${entity}DO po);
 
 
 

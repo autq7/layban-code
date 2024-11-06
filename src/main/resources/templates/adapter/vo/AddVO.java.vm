@@ -1,8 +1,5 @@
-package ${package.Parent}.${qry};
+package ${package.Parent}.${add};
 
-#foreach($pkg in ${table.importPackages})
-import ${pkg};
-#end
 #if(${springdoc})
 import io.swagger.v3.oas.annotations.media.Schema;
 #elseif(${swagger})
@@ -15,6 +12,9 @@ import lombok.Setter;
     #if(${chainModel})
 import lombok.experimental.Accessors;
     #end
+#end
+#if(${entitySerialVersionUID})
+import java.io.Serializable;
 #end
 
 /**
@@ -38,9 +38,9 @@ import lombok.experimental.Accessors;
 @ApiModel(value = "${entity}对象", description = "$!{table.comment}")
 #end
 #if(${entitySerialVersionUID})
-public class ${entity}PageQryVO implements Serializable {
+public class ${entity}AddVO implements Serializable {
 #else
-public class ${entity}PageQryVO {
+public class ${entity}AddVO {
 #end
 #if(${entitySerialVersionUID})
 
@@ -49,7 +49,7 @@ public class ${entity}PageQryVO {
 ## ----------  BEGIN 字段循环遍历  ----------
 #foreach($field in ${table.fields})
 
-    #if("$!field.comment" != "" && !${field.logicDeleteField})
+    #if("$!field.comment" != "" && !${field.keyFlag} && !${field.versionField} && !${field.logicDeleteField})
         #if(${springdoc})
     @Schema(description = "${field.comment}")
         #elseif(${swagger})
@@ -60,14 +60,14 @@ public class ${entity}PageQryVO {
      */
         #end
     #end
-    #if(!${field.logicDeleteField})
+    #if(!${field.keyFlag} && !${field.versionField} && !${field.logicDeleteField})
     private ${field.propertyType} ${field.propertyName};
     #end
 #end
 ## ----------  END 字段循环遍历  ----------
 #if(!${entityLombokModel})
     #foreach($field in ${table.fields})
-        #if(!${field.logicDeleteField})
+        #if(!${field.keyFlag} && !${field.versionField} && !${field.logicDeleteField})
             #if(${field.propertyType.equals("boolean")})
                 #set($getprefix="is")
             #else
@@ -85,7 +85,7 @@ public class ${entity}PageQryVO {
             #end
         this.${field.propertyName} = ${field.propertyName};
             #if(${chainModel})
-    return this;
+        return this;
             #end
     }
         #end
@@ -95,7 +95,7 @@ public class ${entity}PageQryVO {
 ## --end of #if(!${entityLombokModel})--
 #if(${entityColumnConstant})
     #foreach($field in ${table.fields})
-        #if(!${field.logicDeleteField})
+        #if(!${field.keyFlag} && !${field.versionField} && !${field.logicDeleteField})
     public static final String ${field.name.toUpperCase()} = "${field.name}";
         #end
     #end
@@ -117,15 +117,15 @@ public class ${entity}PageQryVO {
     public String toString() {
         return "${entity}{" +
         #foreach($field in ${table.fields})
-            #if(!${field.logicDeleteField})
+            #if(!${field.keyFlag} && !${field.versionField} && !${field.logicDeleteField})
                 #if($!{foreach.index}==0)
-                        "${field.propertyName} = " + ${field.propertyName} +
+                    "${field.propertyName} = " + ${field.propertyName} +
                 #else
-                        ", ${field.propertyName} = " + ${field.propertyName} +
+                    ", ${field.propertyName} = " + ${field.propertyName} +
                 #end
             #end
         #end
-        "}";
+            "}";
     }
 #end
 }

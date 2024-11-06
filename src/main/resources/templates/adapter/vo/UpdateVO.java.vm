@@ -1,8 +1,5 @@
-package ${package.Parent}.${vo};
+package ${package.Parent}.${update};
 
-#foreach($pkg in ${table.importPackages})
-import ${pkg};
-#end
 #if(${springdoc})
 import io.swagger.v3.oas.annotations.media.Schema;
 #elseif(${swagger})
@@ -15,6 +12,9 @@ import lombok.Setter;
     #if(${chainModel})
 import lombok.experimental.Accessors;
     #end
+#end
+#if(${entitySerialVersionUID})
+import java.io.Serializable;
 #end
 
 /**
@@ -38,9 +38,9 @@ import lombok.experimental.Accessors;
 @ApiModel(value = "${entity}对象", description = "$!{table.comment}")
 #end
 #if(${entitySerialVersionUID})
-public class ${entity}VO implements Serializable {
+public class ${entity}UpdateVO implements Serializable {
 #else
-public class ${entity}VO {
+public class ${entity}UpdateVO {
 #end
 #if(${entitySerialVersionUID})
 
@@ -85,9 +85,9 @@ public class ${entity}VO {
             #end
         this.${field.propertyName} = ${field.propertyName};
             #if(${chainModel})
-    return this;
+        return this;
             #end
-        }
+    }
         #end
     #end
     ## --foreach end---

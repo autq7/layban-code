@@ -51,6 +51,11 @@ public class AutoCodeGenerator {
      */
     private static final List<String> TABLES = new ArrayList<>(
             Arrays.asList("system_dict_data"));
+    /**
+     * 表名
+     */
+    private static final List<String> TABLE_PREFIX = new ArrayList<>(
+            Arrays.asList("system_"));
 
     public static void main(String[] args) {
         try {
@@ -77,29 +82,36 @@ public class AutoCodeGenerator {
                 )
                 .strategyConfig(builder -> builder
                         .addInclude(TABLES)
+                        .addTablePrefix(TABLE_PREFIX)
                         .entityBuilder()
+                        .enableLombok()
                         .superClass("com.layban.common.model.BaseModel")
                         .addSuperEntityColumns("creator", "create_time", "update_time", "updater")
                         .versionColumnName("version")
                         .logicDeleteColumnName("deleted")
-                        .formatFileName("%sDO")
-                        .enableLombok()
+                        .javaTemplate("/templates/DO.java")
+                        .disable()
                         .controllerBuilder()
-                        .superClass("com.layban.common.controller.BaseController")
                         .enableRestStyle()
+                        .enableHyphenStyle()
+                        .superClass("com.layban.common.controller.BaseController")
+                        .template("/templates/adapter/controller.java")
                         .serviceBuilder()
                         .superServiceClass("com.layban.common.service.BaseService")
                         .superServiceImplClass("com.layban.common.service.BaseServiceImpl")
                         .formatServiceFileName("%sService")
                         .formatServiceImplFileName("%sServiceImpl")
+                        .serviceTemplate("/templates/service.java")
+                        .serviceImplTemplate("/templates/serviceImpl.java")
                         .mapperBuilder()
                         .mapperAnnotation(Mapper.class)
                         .enableBaseResultMap()
                         .enableBaseColumnList()
+                        .mapperTemplate("/templates/mapper.java")
+                        .mapperXmlTemplate("/templates/mapper.xml")
                 )
                 .injectionConfig(consumer -> {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("dto", "model.dto");
                     map.put("add", "model.vo.add");
                     map.put("update", "model.vo.update");
                     map.put("vo", "model.vo");
@@ -108,48 +120,30 @@ public class AutoCodeGenerator {
                     consumer.customMap(map);
                     List<CustomFile> customFiles = new ArrayList<>();
                     customFiles.add(new CustomFile.Builder()
-                            .formatNameFunction(tableInfo ->
-                                    tableInfo.getEntityName().replaceAll("DO", ""))
-                            .packageName("model.dto")
-                            .fileName("DTO.java")
-                            .templatePath("/templates/dto/DTO.java.vm")
-                            .enableFileOverride()
-                            .build());
-                    customFiles.add(new CustomFile.Builder()
-                            .formatNameFunction(tableInfo ->
-                                    tableInfo.getEntityName().replaceAll("DO", ""))
                             .packageName("model.vo.add")
                             .fileName("AddVO.java")
-                            .templatePath("/templates/vo/AddVO.java.vm")
+                            .templatePath("/templates/adapter/vo/AddVO.java.vm")
                             .enableFileOverride()
                             .build());
                     customFiles.add(new CustomFile.Builder()
-                            .formatNameFunction(tableInfo ->
-                                    tableInfo.getEntityName().replaceAll("DO", ""))
                             .packageName("model.vo.update")
                             .fileName("UpdateVO.java")
-                            .templatePath("/templates/vo/UpdateVO.java.vm")
+                            .templatePath("/templates/adapter/vo/UpdateVO.java.vm")
                             .enableFileOverride()
                             .build());
                     customFiles.add(new CustomFile.Builder()
-                            .formatNameFunction(tableInfo ->
-                                    tableInfo.getEntityName().replaceAll("DO", ""))
                             .packageName("model.vo")
                             .fileName("VO.java")
-                            .templatePath("/templates/vo/VO.java.vm")
+                            .templatePath("/templates/adapter/vo/VO.java.vm")
                             .enableFileOverride()
                             .build());
                     customFiles.add(new CustomFile.Builder()
-                            .formatNameFunction(tableInfo ->
-                                    tableInfo.getEntityName().replaceAll("DO", ""))
                             .packageName("model.vo.qry")
-                            .fileName("PageQryVO.java")
-                            .templatePath("/templates/vo/PageQryVO.java.vm")
+                            .fileName("PageVO.java")
+                            .templatePath("/templates/adapter/vo/PageVO.java.vm")
                             .enableFileOverride()
                             .build());
                     customFiles.add(new CustomFile.Builder()
-                            .formatNameFunction(tableInfo ->
-                                    tableInfo.getEntityName().replaceAll("DO", ""))
                             .packageName("model.convert")
                             .fileName("Convert.java")
                             .templatePath("/templates/convert/Convert.java.vm")
